@@ -17,6 +17,8 @@ namespace AccessToken.Controllers
             var httpClient = new HttpClient();
             GraphOperations graphOperations = new GraphOperations(httpClient);
 
+            await graphOperations.DelegatedAuth();
+
             AuthenticationResult token = await graphOperations.AcquireAccessToken();
 
             var result = await graphOperations.ReadEmailAsync(token.AccessToken);

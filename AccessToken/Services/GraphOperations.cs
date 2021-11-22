@@ -1,4 +1,6 @@
-﻿using Microsoft.Identity.Client;
+﻿using Azure.Identity;
+using Microsoft.Graph;
+using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -23,6 +25,26 @@ namespace AccessToken.Services
         {
             HttpClient = httpClient;
         }
+
+        public async Task DelegatedAuth()
+        {
+            IEnumerable<string> scopes = new string[] { $"{ApiUrl}.default" };
+            var options = new TokenCredentialOptions
+            {
+                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
+            };
+
+            var clientSecretCredential = new ClientSecretCredential(TenantId, ClientId, ClientSecret, options);
+
+            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
+            var messages = await graphClient.Me.Messages
+                .Request()
+                .Select(m => new {
+                    m.Subject,
+                    m.Sender
+                }).GetAsync();
+        }
+
         public async Task<AuthenticationResult> AcquireAccessToken()
         {
             IConfidentialClientApplication app;
@@ -31,7 +53,7 @@ namespace AccessToken.Services
                     .WithAuthority(new Uri(Authority))
                     .Build();
 
-            AuthenticationResult result = null;
+            AuthenticationResult result;
             IEnumerable<string> scopes = new string[] { $"{ApiUrl}.default" };
 
             try
