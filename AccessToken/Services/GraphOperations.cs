@@ -1,8 +1,6 @@
-﻿using Azure.Identity;
-using Microsoft.Graph;
+﻿using AccessToken.Models;
 using Microsoft.Identity.Client;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -16,7 +14,6 @@ namespace AccessToken.Services
     public class GraphOperations
     {
         protected HttpClient HttpClient { get; private set; }
-        private string TenantId = ConfigurationManager.AppSettings["TenantId"];
         private string ClientId = ConfigurationManager.AppSettings["ClientId"];
         private string ClientSecret = ConfigurationManager.AppSettings["ClientSecret"];
         private string Authority = ConfigurationManager.AppSettings["Authority"];
@@ -24,25 +21,6 @@ namespace AccessToken.Services
         public GraphOperations(HttpClient httpClient)
         {
             HttpClient = httpClient;
-        }
-
-        public async Task DelegatedAuth()
-        {
-            IEnumerable<string> scopes = new string[] { $"{ApiUrl}.default" };
-            var options = new TokenCredentialOptions
-            {
-                AuthorityHost = AzureAuthorityHosts.AzurePublicCloud
-            };
-
-            var clientSecretCredential = new ClientSecretCredential(TenantId, ClientId, ClientSecret, options);
-
-            var graphClient = new GraphServiceClient(clientSecretCredential, scopes);
-            var messages = await graphClient.Me.Messages
-                .Request()
-                .Select(m => new {
-                    m.Subject,
-                    m.Sender
-                }).GetAsync();
         }
 
         public async Task<AuthenticationResult> AcquireAccessToken()
@@ -68,9 +46,9 @@ namespace AccessToken.Services
             return result;
         }
 
-        public async Task<List<Object>> ReadEmailAsync(string accessToken)
+        public async Task<OData> ReadEmailAsync(string accessToken, string mailBoxName)
         {
-            List<Object> listObject = new List<object>();
+            OData data = null;
             HttpResponseMessage response = null;
             if (!string.IsNullOrEmpty(accessToken))
             {
@@ -83,7 +61,7 @@ namespace AccessToken.Services
 
                 try
                 {
-                    response = await HttpClient.GetAsync("https://graph.microsoft.com/v1.0/me/messages");
+                    response = await HttpClient.GetAsync($"https://graph.microsoft.com/v1.0/users/{mailBoxName}@7cwr2b.onmicrosoft.com/messages");
                 }
                 catch (Exception ex)
                 {
@@ -94,25 +72,14 @@ namespace AccessToken.Services
                 if (response.IsSuccessStatusCode)
                 {
                     string json = await response.Content.ReadAsStringAsync();
-                    JObject result = JsonConvert.DeserializeObject(json) as JObject;
-                    listObject = processResult(result);
+                    data = JsonConvert.DeserializeObject<OData>(json);
                 }
                 else
                 {
                     string content = await response.Content.ReadAsStringAsync();
                 }
             }
-            return listObject;
-        }
-
-        private List<Object> processResult(JObject result)
-        {
-            List<Object> oDataCollection = new List<object>();
-            foreach (JProperty child in result.Properties().Where(p => !p.Name.StartsWith("@")))
-            {
-                oDataCollection.Add($"{child.Name} = {child.Value}");
-            }
-            return oDataCollection;
+            return data;
         }
     }
 }

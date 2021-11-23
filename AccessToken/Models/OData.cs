@@ -1,37 +1,26 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
 
 namespace AccessToken.Models
 {
     public class OData
     {
-        [JsonProperty("odata.metadata")]
-        public string Metadata { get; set; }
-        public List<Value> Value { get; set; }
-    }
-
-    public class emailAddress
-    {
-        public string name { get; set; }
-        public string address { get; set; }
-    }
-
-    public class body
-    {
-        public string contentType { get; set; }
-        public string content { get; set; }
+        [JsonProperty("@odata.context")]
+        public string odatacontext { get; set; }
+        public Value[] value { get; set; }
+        [JsonProperty("@odata.nextLink")]
+        public string odatanextLink { get; set; }
     }
 
     public class Value
     {
+        [JsonProperty("@odata.etag")]
+        public string odataetag { get; set; }
         public string id { get; set; }
-        public string createdDateTime { get; set; }
-        public string lastModifiedDateTime { get; set; }
+        public DateTime createdDateTime { get; set; }
+        public DateTime lastModifiedDateTime { get; set; }
         public string changeKey { get; set; }
-        public List<string> categories { get; set; }
+        public object[] categories { get; set; }
         public DateTime receivedDateTime { get; set; }
         public DateTime sentDateTime { get; set; }
         public bool hasAttachments { get; set; }
@@ -42,18 +31,51 @@ namespace AccessToken.Models
         public string parentFolderId { get; set; }
         public string conversationId { get; set; }
         public string conversationIndex { get; set; }
-        public bool isDeliveryReceiptRequested { get; set; }
+        //public bool isDeliveryReceiptRequested { get; set; }
         public bool isReadReceiptRequested { get; set; }
         public bool isRead { get; set; }
         public bool isDraft { get; set; }
         public string webLink { get; set; }
         public string inferenceClassification { get; set; }
-        public List<body> body { get; set; }
-        public virtual emailAddress sender { get; set; }
-        public virtual emailAddress from { get; set; }
-        public virtual List<emailAddress> toRecipients { get; set; }
-        public List<string> ccRecipients { get; set; }
-        public List<string> bccRecipients { get; set; }
-        public List<string> replyTo { get; set; }
+        public Body body { get; set; }
+        public Sender sender { get; set; }
+        public From from { get; set; }
+        public Torecipient[] toRecipients { get; set; }
+        public object[] ccRecipients { get; set; }
+        public object[] bccRecipients { get; set; }
+        public object[] replyTo { get; set; }
+        public Flag flag { get; set; }
+    }
+
+    public class Body
+    {
+        public string contentType { get; set; }
+        public string content { get; set; }
+    }
+
+    public class Sender
+    {
+        public Emailaddress emailAddress { get; set; }
+    }
+
+    public class Emailaddress
+    {
+        public string name { get; set; }
+        public string address { get; set; }
+    }
+
+    public class From
+    {
+        public Emailaddress emailAddress { get; set; }
+    }
+
+    public class Flag
+    {
+        public string flagStatus { get; set; }
+    }
+
+    public class Torecipient
+    {
+        public Emailaddress emailAddress { get; set; }
     }
 }

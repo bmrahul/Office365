@@ -1,29 +1,27 @@
-﻿using AccessToken.Services;
+﻿using AccessToken.Models;
+using AccessToken.Services;
 using Microsoft.Identity.Client;
-using System;
 using System.Net.Http;
 using System.Threading.Tasks;
 using System.Web.Http;
 
 namespace AccessToken.Controllers
 {
-    [RoutePrefix("api/Home")]
+    [RoutePrefix("api/home")]
     public class HomeController : ApiController
     {
-        [Route("Index")]
+        [Route("index/{mailBoxName}")]
         [HttpGet]
-        public async Task<IHttpActionResult> Index()
+        public async Task<IHttpActionResult> Index(string mailBoxName)
         {
             var httpClient = new HttpClient();
             GraphOperations graphOperations = new GraphOperations(httpClient);
 
-            await graphOperations.DelegatedAuth();
-
             AuthenticationResult token = await graphOperations.AcquireAccessToken();
 
-            var result = await graphOperations.ReadEmailAsync(token.AccessToken);
+            var result = await graphOperations.ReadEmailAsync(token.AccessToken, mailBoxName);
 
-            return Json<Object>(result);
+            return Json<OData>(result);
         }
     }
 }
