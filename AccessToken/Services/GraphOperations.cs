@@ -46,40 +46,26 @@ namespace AccessToken.Services
             return result;
         }
 
-        public async Task<OData> ReadEmailAsync(string accessToken, string mailBoxName)
+        public async Task<HttpResponseMessage> ReadEmailAsync(string accessToken, string mailBoxName)
         {
-            OData data = null;
             HttpResponseMessage response = null;
-            if (!string.IsNullOrEmpty(accessToken))
+            var defaultRequestHeaders = HttpClient.DefaultRequestHeaders;
+            if (defaultRequestHeaders.Accept == null || !defaultRequestHeaders.Accept.Any(m => m.MediaType == "application/json"))
             {
-                var defaultRequestHeaders = HttpClient.DefaultRequestHeaders;
-                if (defaultRequestHeaders.Accept == null || !defaultRequestHeaders.Accept.Any(m => m.MediaType == "application/json"))
-                {
-                    HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
-                }
-                defaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-
-                try
-                {
-                    response = await HttpClient.GetAsync($"https://graph.microsoft.com/v1.0/users/{mailBoxName}@7cwr2b.onmicrosoft.com/messages");
-                }
-                catch (Exception ex)
-                {
-
-                    throw new Exception(ex.Message);
-                }
-
-                if (response.IsSuccessStatusCode)
-                {
-                    string json = await response.Content.ReadAsStringAsync();
-                    data = JsonConvert.DeserializeObject<OData>(json);
-                }
-                else
-                {
-                    string content = await response.Content.ReadAsStringAsync();
-                }
+                HttpClient.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
             }
-            return data;
+            defaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+
+            try
+            {
+                response = await HttpClient.GetAsync($"https://graph.microsoft.com/v1.0/users/{mailBoxName}@7cwr2b.onmicrosoft.com/messages");
+            }
+            catch (Exception ex)
+            {
+
+                throw new Exception(ex.Message);
+            }
+            return response;
         }
     }
 }
