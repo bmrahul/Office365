@@ -16,9 +16,9 @@ namespace AccessToken.Controllers
     {
         private string ClientId = ConfigurationManager.AppSettings["ClientId"];
 
-        [Route("index/{mailBoxName}")]
+        [Route("application/{mailBoxName}")]
         [HttpGet]
-        public async Task<IHttpActionResult> Index(string mailBoxName)
+        public async Task<IHttpActionResult> application(string mailBoxName)
         {
             OData data;
             var httpClient = new HttpClient();
@@ -47,9 +47,9 @@ namespace AccessToken.Controllers
             }
         }
 
-        [Route("getmailbox/{username}/{secret}")]
+        [Route("delegated/{username}/{secret}")]
         [HttpGet]
-        public async Task<IHttpActionResult> GetMailBox(string username, string secret)
+        public async Task<IHttpActionResult> Delegated(string username, string secret)
         {
             AuthenticationConfig config = AuthenticationConfig.ReadFromJsonFile();
             var appConfig = config.PublicClientApplicationOptions;
