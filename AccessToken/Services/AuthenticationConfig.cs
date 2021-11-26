@@ -9,12 +9,6 @@ namespace AccessToken.Services
     {
         public PublicClientApplicationOptions PublicClientApplicationOptions { get; set; }
         public string MicrosoftGraphBaseEndpoint { get; set; }
-        public static string ClientId { get; } = System.Configuration.ConfigurationManager.AppSettings["ClientId"];
-        public static string ClientSecret { get; } = System.Configuration.ConfigurationManager.AppSettings["ClientSecret"];
-        public static string RedirectUri { get; } = System.Configuration.ConfigurationManager.AppSettings["RedirectUri"];
-        public static string AADInstance { get; } = System.Configuration.ConfigurationManager.AppSettings["AADInstance"];
-
-        public static string Authority = string.Format(CultureInfo.InvariantCulture, AADInstance, "common", "/v2.0");
 
         public static AuthenticationConfig ReadFromJsonFile()
         {

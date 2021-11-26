@@ -1,6 +1,4 @@
-﻿using AccessToken.Models;
-using Microsoft.Identity.Client;
-using Newtonsoft.Json;
+﻿using Microsoft.Identity.Client;
 using System;
 using System.Collections.Generic;
 using System.Configuration;

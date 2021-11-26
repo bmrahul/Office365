@@ -4,8 +4,6 @@ using Microsoft.Identity.Client;
 using Newtonsoft.Json;
 using System.Configuration;
 using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Security;
 using System.Threading.Tasks;
 using System.Web.Http;
 
